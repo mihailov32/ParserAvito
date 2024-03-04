@@ -45,6 +45,8 @@ namespace ParserAvito
             string selectorLink = "div.iva-item-titleStep-pdebR>div.iva-item-title-py3i_>a";
             string[][] array = new string[result.Count][];
 
+            int maxPage = GetMaxPage(Response);
+
             for (int i = 0; i < result.Count; i++)
             {
                 array[i] = new string[]{
@@ -125,14 +127,28 @@ namespace ParserAvito
 
     
 
-        public string GetMaxPage()
+        public static int GetMaxPage(string Response)
         {
+            HtmlParser parser = new HtmlParser();
+            string SelMaxPage = "span.styles-module-text-InivV";
+            var doc = parser.ParseDocument(Response);
+            int maxPage = 0;
+            foreach (var s in doc.QuerySelectorAll(SelMaxPage))
+            {
+                try
+                {
+                    if(Convert.ToInt32(s.TextContent) > maxPage)
+                    {
+                        maxPage = Convert.ToInt32(s.TextContent);
+                    };
+                }
+                catch
+                {
+                    continue;
+                }
+            }
 
-
-
-
-
-            return null;
+            return maxPage;
         }
     }
 }

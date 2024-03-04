@@ -40,14 +40,13 @@ namespace ParserAvito
                 string link = line[0];
                 string minPrice = line[1];
                 string maxPrice = line[2];
-                string maxPage = line[3];
-                string nameElement = line[4];
+                string nameElement = line[3];
 
-                thread[i] = new Thread(new ThreadStart(delegate { StartParsing(link, nameElement, minPrice, maxPrice, maxPage); }));
+                thread[i] = new Thread(new ThreadStart(delegate { StartParsing(link, nameElement, minPrice, maxPrice); }));
                 thread[i].Start();
             }
         }
-        private void StartParsing(string link, string nameElement, string minPrice, string maxPrice, string maxPage)
+        private void StartParsing(string link, string nameElement, string minPrice, string maxPrice)
         {
             while (enabled)
             {
@@ -55,29 +54,31 @@ namespace ParserAvito
                 List<string> parsing = new List<string>();
 
                 Random random = new Random();
-                for (int p = 1; p < Convert.ToInt32(maxPage); p++)
+
+                if (!Connection.OK())
                 {
-                    if (enabled == false)
+                    MessageBox.Show("Отсутствует интернет соединение");
+
+                    enabled = false;
+
+                    Invoke((MethodInvoker)delegate
                     {
-                        break;
-                    }
-                    else
+                        CheckZXCCat();
+                    });
+                    break;
+                }
+                else
+                {
+                    string response = Avito.GetPage(link);
+                    for (int p = 1; p < Avito.GetMaxPage(response); p++)
                     {
-                        if (!Connection.OK())
+                        if (enabled == false)
                         {
-                            MessageBox.Show("Отсутствует интернет соединение");
-
-                            enabled = false;
-
-                            Invoke((MethodInvoker)delegate
-                            {
-                                CheckZXCCat();
-                            });
                             break;
                         }
                         else
                         {
-                            string response = Avito.GetPage(link + "&p=" + p.ToString());
+                            response = Avito.GetPage(link + "&p=" + p.ToString());
                             if (response != null)
                             {
                                 parsing = Avito.ParseString(response, Convert.ToInt32(maxPrice), Convert.ToInt32(minPrice), nameElement);
@@ -97,9 +98,11 @@ namespace ParserAvito
                                     }
                                 });
                             }
-                            Thread.Sleep(GetSettingCount(path) * random.Next(65000, 80000));
+                            Thread.Sleep(GetSettingCount(path) * random.Next(70000, 80000));
+
                         }
                     }
+
                 }
             }
         }
