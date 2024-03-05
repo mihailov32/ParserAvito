@@ -31,8 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddFilter));
             this.label5 = new System.Windows.Forms.Label();
             this.NameTextBox = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.MaxPageTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.MaxPriceTextBox = new System.Windows.Forms.TextBox();
@@ -59,22 +57,6 @@
             this.NameTextBox.TabIndex = 28;
             this.NameTextBox.Text = "Не важно";
             this.NameTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(158, 94);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(117, 13);
-            this.label4.TabIndex = 27;
-            this.label4.Text = "Макс. кол-во страниц";
-            // 
-            // MaxPageTextBox
-            // 
-            this.MaxPageTextBox.Location = new System.Drawing.Point(161, 110);
-            this.MaxPageTextBox.Name = "MaxPageTextBox";
-            this.MaxPageTextBox.Size = new System.Drawing.Size(100, 20);
-            this.MaxPageTextBox.TabIndex = 26;
             // 
             // label3
             // 
@@ -145,8 +127,6 @@
             this.Controls.Add(this.buttonAddFilter);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.NameTextBox);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.MaxPageTextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.MaxPriceTextBox);
@@ -164,8 +144,6 @@
 
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox NameTextBox;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox MaxPageTextBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox MaxPriceTextBox;

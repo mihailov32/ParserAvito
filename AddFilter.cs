@@ -1,13 +1,5 @@
-﻿using AngleSharp.Html.Dom;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ParserAvito
@@ -23,20 +15,19 @@ namespace ParserAvito
         {
             string path = @"Settings\Filters.txt";
             string filter = "";
-            if (LinkValidation() && MinPriceValidation() && MaxPriceValidation() && MaxPageValidation())
+            if (LinkValidation() && MinPriceValidation() && MaxPriceValidation())
             {
                 string link = LinkTextBox.Text;
                 string minPrice = MinPriceTexBox.Text;
                 string maxPrice = MaxPriceTextBox.Text;
-                string MaxPage = MaxPageTextBox.Text;
                 string name = NameTextBox.Text;
-                filter = link + "|" + minPrice + "|" + maxPrice + "|" + MaxPage + "|" + name;
+                filter = link + "|" + minPrice + "|" + maxPrice + "|" + name;
                 WriteParameter(filter, path);
             }
             this.Close();
 
         }
-      
+
         private bool LinkValidation()
         {
             if (LinkTextBox.Text == "")
@@ -66,15 +57,6 @@ namespace ParserAvito
             else return true;
         }
 
-        private bool MaxPageValidation()
-        {
-            if (MaxPageTextBox.Text == "")
-            {
-                MaxPageTextBox.Text = "Пустое поле";
-                return false;
-            }
-            else return true;
-        }
 
         private void WriteParameter(string line, string path)
         {

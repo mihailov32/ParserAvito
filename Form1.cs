@@ -12,7 +12,7 @@ namespace ParserAvito
 {
     public partial class Form1 : Form
     {
-        AddFilter AddFilter = new AddFilter();
+        AddFilter addFilter = null;
         static string path = @"Settings\Filters.txt";
         bool enabled = true;
         public Form1()
@@ -161,7 +161,11 @@ namespace ParserAvito
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            AddFilter.Show();
+            if (addFilter == null || addFilter.IsDisposed)
+            {
+                addFilter = new AddFilter();
+                addFilter.Show();
+            }
         }
 
         private void OpenSettings_Click(object sender, EventArgs e)
