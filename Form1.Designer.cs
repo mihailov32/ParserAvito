@@ -36,6 +36,7 @@
             this.buttonAdd = new System.Windows.Forms.Button();
             this.OpenSettings = new System.Windows.Forms.Button();
             this.PictureBoxZXC = new System.Windows.Forms.PictureBox();
+            this.AddToken = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBoxZXC)).BeginInit();
             this.SuspendLayout();
             // 
@@ -112,11 +113,22 @@
             this.PictureBoxZXC.TabStop = false;
             this.PictureBoxZXC.Visible = false;
             // 
+            // AddToken
+            // 
+            this.AddToken.Location = new System.Drawing.Point(40, 83);
+            this.AddToken.Name = "AddToken";
+            this.AddToken.Size = new System.Drawing.Size(156, 23);
+            this.AddToken.TabIndex = 26;
+            this.AddToken.Text = "Добавить телегу";
+            this.AddToken.UseVisualStyleBackColor = true;
+            this.AddToken.Click += new System.EventHandler(this.AddToken_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.AddToken);
             this.Controls.Add(this.PictureBoxZXC);
             this.Controls.Add(this.OpenSettings);
             this.Controls.Add(this.buttonAdd);
@@ -128,7 +140,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Жеский парсер 0.07";
+            this.Text = "Жеский парсер 0.08";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.PictureBoxZXC)).EndInit();
             this.ResumeLayout(false);
@@ -145,6 +157,7 @@
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button OpenSettings;
         private System.Windows.Forms.PictureBox PictureBoxZXC;
+        private System.Windows.Forms.Button AddToken;
     }
 }
 

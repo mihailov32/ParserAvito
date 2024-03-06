@@ -14,6 +14,8 @@ namespace ParserAvito
         private void buttonAddFilter_Click(object sender, EventArgs e)
         {
             string path = @"Settings\Filters.txt";
+            if(!Directory.Exists("Settings"))
+                Directory.CreateDirectory("Settings");
             string filter = "";
             if (LinkValidation() && MinPriceValidation() && MaxPriceValidation())
             {

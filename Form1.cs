@@ -95,6 +95,7 @@ namespace ParserAvito
                                     if (!Log.Text.Contains(parsing[i].ToString()))
                                     {
                                         Log.Text += parsing[i];
+                                        Telega.Start(parsing[i]);
                                     }
                                 });
                             }
@@ -176,6 +177,27 @@ namespace ParserAvito
             }
             else
                 MessageBox.Show("Фильтры отсутствуют");
+        }
+
+        private void AddToken_Click(object sender, EventArgs e)
+        {
+            if (Directory.Exists("Settings"))
+            {
+                if (File.Exists("Settings\\TelegramToken.txt"))
+                {
+                    Process.Start("C:\\Windows\\System32\\notepad.exe", @"Settings\TelegramToken.txt");
+                }
+                else
+                {
+                    File.Create("Settings\\TelegramToken.txt");
+                    Process.Start("C:\\Windows\\System32\\notepad.exe", @"Settings\TelegramToken.txt");
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory("Settingts");
+                File.Create("Settings\\TelegramToken.txt");
+            }
         }
     }
 }
