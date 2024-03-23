@@ -14,7 +14,7 @@ namespace ParserAvito
 {
     internal class Avito
     {
-        
+
         // Получение исходного кода страницы
         public static string GetPage(string link)
         {
@@ -24,10 +24,10 @@ namespace ParserAvito
             request.AddHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
             request.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
             request.KeepAlive = true;
-            request.UserAgent = Http.ChromeUserAgent();
+            request.UserAgent = Http.RandomUserAgent();
             try
             {
-                string response = request.Get(link).ToString();
+                var response = request.Get(link).ToString();
                 return response;
             }
             catch
@@ -90,6 +90,8 @@ namespace ParserAvito
             for (int i = 0; i < stringArray.Length; i++)
             {
                 var PriceInt = (stringArray[i][1].Replace("₽", ""));
+                if (PriceInt.ToLower().Contains("бесплатно"))
+                    PriceInt = "0";
                 string priceString = DeleteChar(PriceInt, ' ');
                 if (priceString.Contains("Цена не указана"))
                 {
@@ -125,7 +127,7 @@ namespace ParserAvito
             return result;
         }
 
-    
+
 
         public static int GetMaxPage(string Response)
         {
@@ -137,7 +139,7 @@ namespace ParserAvito
             {
                 try
                 {
-                    if(Convert.ToInt32(s.TextContent) > maxPage)
+                    if (Convert.ToInt32(s.TextContent) > maxPage)
                     {
                         maxPage = Convert.ToInt32(s.TextContent);
                     };
@@ -147,7 +149,6 @@ namespace ParserAvito
                     continue;
                 }
             }
-
             return maxPage;
         }
     }

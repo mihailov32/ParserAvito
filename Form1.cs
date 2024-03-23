@@ -15,6 +15,9 @@ namespace ParserAvito
         AddFilter addFilter = null;
         static string path = @"Settings\Filters.txt";
         bool enabled = true;
+        int countCheckPage = 0;
+        int countError = 0;
+
         public Form1()
         {
             InitializeComponent();
@@ -22,7 +25,19 @@ namespace ParserAvito
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            notifyIcon1.BalloonTipTitle = "Парсер Avito";
+            notifyIcon1.BalloonTipText = "Приложение свернуто";
+            notifyIcon1.Text = "Парсер Avito";
 
+            if (!Directory.Exists("Settings") || !File.Exists(path))
+            {
+                Directory.CreateDirectory("Settings");
+                using (FileStream fileStream = new FileStream(path, FileMode.Create))
+                {
+                    fileStream.Dispose();
+                }
+                File.Create("Settings\\TelegramToken.txt").Dispose();
+            }
         }
 
 
@@ -30,6 +45,7 @@ namespace ParserAvito
         {
             PictureBoxZXC.Enabled = true;
             PictureBoxZXC.Visible = true;
+
 
             Thread[] thread = new Thread[ReadSettings(path).Length];
             enabled = true;
@@ -70,6 +86,8 @@ namespace ParserAvito
                 else
                 {
                     string response = Avito.GetPage(link);
+                    if (response == null)
+                        MessageBox.Show("пиздец");
                     for (int p = 1; p < Avito.GetMaxPage(response); p++)
                     {
                         if (enabled == false)
@@ -78,29 +96,44 @@ namespace ParserAvito
                         }
                         else
                         {
-                            response = Avito.GetPage(link + "&p=" + p.ToString());
+                            if (p != 1)
+                                response = Avito.GetPage(link + "&p=" + p.ToString());
                             if (response != null)
                             {
                                 parsing = Avito.ParseString(response, Convert.ToInt32(maxPrice), Convert.ToInt32(minPrice), nameElement);
-                            }
-                            else
-                            {
-                                MessageBox.Show("Ошибка запроса");
-                            }
-
-                            for (int i = 0; i < parsing.Count; i++)
-                            {
                                 this.Invoke((MethodInvoker)delegate
                                 {
-                                    if (!Log.Text.Contains(parsing[i].ToString()))
+                                    CountCheckPage.Text = "Просмотренно странниц: " + ++countCheckPage;
+                                    for (int i = 0; i < parsing.Count; i++)
                                     {
-                                        Log.Text += parsing[i];
-                                        Telega.Start(parsing[i]);
+                                        if (!Log.Text.Contains(parsing[i].ToString()))
+                                        {
+                                            Log.Text += parsing[i];
+                                            Telega.Start(parsing[i]);
+                                        }
                                     }
                                 });
                             }
-                            Thread.Sleep(GetSettingCount(path) * random.Next(70000, 80000));
+                            else
+                            {
+                                this.Invoke((MethodInvoker)delegate
+                                {
+                                    CountError.Text = "Ошибок: " + ++countError;
+                                });
+                            }
 
+                            //for (int i = 0; i < parsing.Count; i++)
+                            //{
+                            //    this.Invoke((MethodInvoker)delegate
+                            //    {
+                            //        if (!Log.Text.Contains(parsing[i].ToString()))
+                            //        {
+                            //            Log.Text += parsing[i];
+                            //            Telega.Start(parsing[i]);
+                            //        }
+                            //    });
+                            //}
+                            Thread.Sleep(GetSettingCount(path) * random.Next(30000, 60000));
                         }
                     }
 
@@ -189,14 +222,40 @@ namespace ParserAvito
                 }
                 else
                 {
-                    File.Create("Settings\\TelegramToken.txt");
+                    File.Create("Settings\\TelegramToken.txt").Dispose();
                     Process.Start("C:\\Windows\\System32\\notepad.exe", @"Settings\TelegramToken.txt");
                 }
             }
             else
             {
                 Directory.CreateDirectory("Settingts");
-                File.Create("Settings\\TelegramToken.txt");
+                File.Create("Settings\\TelegramToken.txt").Dispose();
+            }
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            notifyIcon1.Visible = false;
+            WindowState = FormWindowState.Normal;
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                this.Hide();
+                notifyIcon1.Visible = true;
+                notifyIcon1.ShowBalloonTip(1000);
+            }
+            else if (FormWindowState.Normal == this.WindowState)
+            {
+                notifyIcon1.Visible = false;
             }
         }
     }
