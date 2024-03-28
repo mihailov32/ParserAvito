@@ -45,14 +45,18 @@ namespace ParserAvito
                 }
                 File.Create("Settings\\TelegramToken.txt").Dispose();
             }
-            File.WriteAllText("work\\version.txt", Assembly.GetEntryAssembly().GetName().Version.ToString());
-             
+            if (Connection.OK())
+            {
+                if (GetPage("https://github.com/mihailov32/ParserAvito/blob/master/work/version.txt").Contains(Assembly.GetEntryAssembly().GetName().Version.ToString()))
+                    MessageBox.Show("Версия программы устарела", "Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
-        private void CheckVersion()
+        private string GetPage(string url)
         {
             WebClient client = new WebClient();
-            string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            var page = client.DownloadString(url);
+            return page;
         }
 
 
