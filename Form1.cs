@@ -47,7 +47,7 @@ namespace ParserAvito
             }
             if (Connection.OK())
             {
-                if (GetPage("https://github.com/mihailov32/ParserAvito/blob/master/work/version.txt").Contains(Assembly.GetEntryAssembly().GetName().Version.ToString()))
+                if (!GetPage("https://github.com/mihailov32/ParserAvito/blob/master/work/version.txt").Contains(Assembly.GetEntryAssembly().GetName().Version.ToString()))
                     MessageBox.Show("Версия программы устарела", "Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
