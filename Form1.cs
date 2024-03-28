@@ -7,6 +7,11 @@ using System.IO;
 using System.Diagnostics;
 using ParserAvito.work;
 using System.Net;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium;
+using System.Threading.Tasks;
+using OpenQA.Selenium.Interactions;
+using System.Reflection;
 
 namespace ParserAvito
 {
@@ -25,6 +30,8 @@ namespace ParserAvito
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            this.Text = Assembly.GetEntryAssembly().GetName().Version.ToString();
+
             notifyIcon1.BalloonTipTitle = "Парсер Avito";
             notifyIcon1.BalloonTipText = "Приложение свернуто";
             notifyIcon1.Text = "Парсер Avito";
@@ -38,108 +45,109 @@ namespace ParserAvito
                 }
                 File.Create("Settings\\TelegramToken.txt").Dispose();
             }
+            File.WriteAllText("work\\version.txt", Assembly.GetEntryAssembly().GetName().Version.ToString());
+             
+        }
+
+        private void CheckVersion()
+        {
+            WebClient client = new WebClient();
+            string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
         }
 
 
-        private void startButton_Click(object sender, EventArgs e)
+        private async void startButton_Click(object sender, EventArgs e)
         {
-            PictureBoxZXC.Enabled = true;
             PictureBoxZXC.Visible = true;
-
-
+            PictureBoxZXC.Enabled = true;
             Thread[] thread = new Thread[ReadSettings(path).Length];
+
             enabled = true;
             string[] settings = ReadSettings(path);
-            for (int i = 0; i < settings.Length; i++)
-            {
-                string[] line = settings[i].Split('|');
-                string link = line[0];
-                string minPrice = line[1];
-                string maxPrice = line[2];
-                string nameElement = line[3];
 
-                thread[i] = new Thread(new ThreadStart(delegate { StartParsing(link, nameElement, minPrice, maxPrice); }));
-                thread[i].Start();
+            while (enabled)
+            {
+                for (int i = 0; i < settings.Length; i++)
+                {
+                    string[] line = settings[i].Split('|');
+                    string link = line[0];
+                    string minPrice = line[1];
+                    string maxPrice = line[2];
+                    string nameElement = line[3];
+
+                    if (!Connection.OK())
+                    {
+                        MessageBox.Show("Отсутствует интернет соединение");
+                        enabled = false;
+
+                        Invoke((MethodInvoker)delegate
+                        {
+                            CheckZXCCat();
+                        });
+                        break;
+                    }
+
+                    await Task.Run(() =>
+                    {
+                        StartParsing(link, nameElement, minPrice, maxPrice);
+                        Task.Delay(1000);
+                    });
+                }
             }
         }
         private void StartParsing(string link, string nameElement, string minPrice, string maxPrice)
         {
-            while (enabled)
+            List<string> parsing = new List<string>();
+
+            var options = new ChromeOptions();
+            options.AddArgument("User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
+            options.AddArgument("--disable-blink-features=AutomationControlled");
+            IWebDriver driver = new ChromeDriver(options);
+            driver.Url = link;
+
+            for (int p = 1; p < Parsing.GetMaxGage(driver); p++)
             {
-
-                List<string> parsing = new List<string>();
-
-                Random random = new Random();
-
-                if (!Connection.OK())
+                if (enabled == false)
                 {
-                    MessageBox.Show("Отсутствует интернет соединение");
 
-                    enabled = false;
-
-                    Invoke((MethodInvoker)delegate
-                    {
-                        CheckZXCCat();
-                    });
                     break;
                 }
                 else
                 {
-                    string response = Avito.GetPage(link);
-                    if (response == null)
-                        MessageBox.Show("пиздец");
-                    for (int p = 1; p < Avito.GetMaxPage(response); p++)
+                    string[][] array = Parsing.GetPage(driver);
+                    if (array != null)
                     {
-                        if (enabled == false)
+                        parsing = Parsing.Filtration(array, Convert.ToInt32(maxPrice), Convert.ToInt32(minPrice), nameElement);
+                        this.Invoke((MethodInvoker)delegate
                         {
-                            break;
-                        }
-                        else
-                        {
-                            if (p != 1)
-                                response = Avito.GetPage(link + "&p=" + p.ToString());
-                            if (response != null)
+                            CountCheckPage.Text = "Просмотренно странниц: " + ++countCheckPage;
+                            for (int i = 0; i < parsing.Count; i++)
                             {
-                                parsing = Avito.ParseString(response, Convert.ToInt32(maxPrice), Convert.ToInt32(minPrice), nameElement);
-                                this.Invoke((MethodInvoker)delegate
+                                if (!Log.Text.Contains(parsing[i].ToString()))
                                 {
-                                    CountCheckPage.Text = "Просмотренно странниц: " + ++countCheckPage;
-                                    for (int i = 0; i < parsing.Count; i++)
-                                    {
-                                        if (!Log.Text.Contains(parsing[i].ToString()))
-                                        {
-                                            Log.Text += parsing[i];
-                                            Telega.Start(parsing[i]);
-                                        }
-                                    }
-                                });
+                                    Log.Text += parsing[i];
+                                    Telega.Start(parsing[i]);
+                                }
                             }
-                            else
-                            {
-                                this.Invoke((MethodInvoker)delegate
-                                {
-                                    CountError.Text = "Ошибок: " + ++countError;
-                                });
-                            }
-
-                            //for (int i = 0; i < parsing.Count; i++)
-                            //{
-                            //    this.Invoke((MethodInvoker)delegate
-                            //    {
-                            //        if (!Log.Text.Contains(parsing[i].ToString()))
-                            //        {
-                            //            Log.Text += parsing[i];
-                            //            Telega.Start(parsing[i]);
-                            //        }
-                            //    });
-                            //}
-                            Thread.Sleep(GetSettingCount(path) * random.Next(30000, 60000));
-                        }
+                        });
                     }
-
+                    else
+                    {
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            CountError.Text = "Ошибок: " + ++countError;
+                        });
+                    }
                 }
+                driver.FindElement(By.CssSelector("[data-marker='pagination-button/nextPage']")).Click();
+                Task.Delay(1000);
             }
+            driver.Close();
+            driver.Quit();
+            Task.Delay(5000);
         }
+
+
 
 
         private static string[] ReadSettings(string path)
