@@ -12,6 +12,8 @@ namespace ParserAvito.work
             client.SendTextMessageAsync(token, link);
         }
 
+
+
         public static string GetToken()
         {
             string token = File.ReadAllText("Settings\\TelegramToken.txt");

@@ -29,18 +29,22 @@ namespace ParserAvito.work
                 }
                 return array;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
         }
 
-        public static List<string> Filtration(string[][] array, int maxPrice, int minPrice, string nameElement)
+        public static List<string> Filtration(string[][] array, int maxPrice, int minPrice, string[] nameElement)
         {
             List<string> result = new List<string>();
-            if (nameElement == "Не важно")
+            for (int i = 0; i < nameElement.Length; i++)
             {
-                nameElement = "";
+                if (nameElement[i] == "Не важно")
+                {
+                    nameElement[i] = "";
+                }
+
             }
             for (int i = 0; i < array.Length; i++)
             {
@@ -49,16 +53,19 @@ namespace ParserAvito.work
                     priceInt = "0";
                 if (priceInt.Contains("Цена не указана"))
                     continue;
-                if (array[i][0].ToLower().Contains(nameElement) && Convert.ToInt32(priceInt) > minPrice && Convert.ToInt32(priceInt) < maxPrice)
+                for (int j = 0; j < nameElement.Length; j++)
                 {
-                    string withFilter = "";
-                    withFilter += array[i][0].ToString() + " ";
-                    withFilter += array[i][1].ToString() + "\n";
-                    withFilter += array[i][2].ToString() + "\n";
-                    result.Add(withFilter);
+                    if (array[i][0].ToLower().Contains(nameElement[j]) && Convert.ToInt32(priceInt) > minPrice && Convert.ToInt32(priceInt) < maxPrice)
+                    {
+                        string withFilter = "";
+                        withFilter += array[i][0].ToString() + " ";
+                        withFilter += array[i][1].ToString() + "\n";
+                        withFilter += array[i][2].ToString() + "\n";
+                        result.Add(withFilter);
+                    }
                 }
             }
-            Task.Delay(1000);
+            Task.Delay(1000).Wait();
             return result;
         }
 

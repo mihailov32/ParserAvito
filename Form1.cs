@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
-using System.IO;
-using System.Diagnostics;
-using ParserAvito.work;
-using System.Net;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
-using System.Threading.Tasks;
-using OpenQA.Selenium.Interactions;
+using ParserAvito.work;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ParserAvito
 {
@@ -30,7 +29,8 @@ namespace ParserAvito
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Text = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            string curVer = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            this.Text = curVer;
 
             notifyIcon1.BalloonTipTitle = "Парсер Avito";
             notifyIcon1.BalloonTipText = "Приложение свернуто";
@@ -44,6 +44,7 @@ namespace ParserAvito
                     fileStream.Dispose();
                 }
                 File.Create("Settings\\TelegramToken.txt").Dispose();
+                File.AppendAllText("Settings\\version.txt", curVer);
             }
             if (Connection.OK())
             {
@@ -59,7 +60,6 @@ namespace ParserAvito
             return page;
         }
 
-
         private async void startButton_Click(object sender, EventArgs e)
         {
             PictureBoxZXC.Visible = true;
@@ -68,7 +68,12 @@ namespace ParserAvito
 
             enabled = true;
             string[] settings = ReadSettings(path);
-
+            if (settings.Length == 0)
+            {
+                MessageBox.Show("Не заданны параметры");
+                enabled = false;
+                CheckZXCCat();
+            }
             while (enabled)
             {
                 for (int i = 0; i < settings.Length; i++)
@@ -77,7 +82,7 @@ namespace ParserAvito
                     string link = line[0];
                     string minPrice = line[1];
                     string maxPrice = line[2];
-                    string nameElement = line[3];
+                    string[] nameElement = line[3].Split('&');
 
                     if (!Connection.OK())
                     {
@@ -99,7 +104,7 @@ namespace ParserAvito
                 }
             }
         }
-        private void StartParsing(string link, string nameElement, string minPrice, string maxPrice)
+        private void StartParsing(string link, string[] nameElement, string minPrice, string maxPrice)
         {
             List<string> parsing = new List<string>();
 

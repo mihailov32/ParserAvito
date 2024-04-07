@@ -27,7 +27,6 @@ namespace ParserAvito
                 WriteParameter(filter, path);
             }
             this.Close();
-
         }
 
         private bool LinkValidation()
